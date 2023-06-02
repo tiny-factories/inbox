@@ -2,8 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
+    provider = "prisma-client-js"
 }
 
 datasource db {
@@ -23,7 +22,7 @@ model Post {
 }
 
 model Comment {
-    id        Int      @id @default(autoincrement())
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     text      String
     author    String
@@ -88,5 +87,4 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
-
 
