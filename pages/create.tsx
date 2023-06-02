@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import Router from "next/router";
+import Dropdown from "../components/SelectUserDropdown";
 
 const Draft: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [options, setOptions] = useState([]);
 
   const submitData = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -26,13 +28,14 @@ const Draft: React.FC = () => {
       <div>
         <form onSubmit={submitData}>
           <h1>New Draft</h1>
-          <input
+         <Dropdown />
+          {/* <input
             autoFocus
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
             type="text"
             value={title}
-          />
+          /> */}
           <textarea
             cols={50}
             onChange={(e) => setContent(e.target.value)}
