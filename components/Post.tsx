@@ -2,6 +2,16 @@ import React from "react";
 import Router from "next/router";
 import ReactMarkdown from "react-markdown";
 
+export type CommentProps = {
+  id: String;
+  createdAt: Date;
+  text: String;
+  author: String;
+  authorId: String;
+  post: any;
+  postId: String;
+};
+
 export type PostProps = {
   id: number;
   title: string;
@@ -11,6 +21,7 @@ export type PostProps = {
   } | null;
   content: string;
   published: boolean;
+  Comment: CommentProps[];
 };
 
 const Post: React.FC<{ post: PostProps }> = ({ post }) => {

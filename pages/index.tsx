@@ -1,27 +1,22 @@
 import React from "react";
 import type { GetStaticProps } from "next";
+import Link from "next/link";
+
 import Layout from "../components/Layout";
-import Post, { PostProps } from "../components/Post";
+// import Post, { PostProps } from "../components/Post";
+import { InboxProps } from "../components/Inbox";
 import prisma from "../lib/prisma";
 
 type Props = {
-  feed: PostProps[];
+  feed: InboxProps[];
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  const feed = await prisma.post.findMany({
-    where: {
-      published: true,
-    },
+  const feed = await prisma.inbox.findMany({
     include: {
-      author: {
-        select: {
-          name: true,
-        },
-      },
+      Post: { select: { content: true } },
     },
   });
-
   const serializedFeedData = feed.map((item) => ({
     ...item,
     createdAt: item.createdAt.toISOString(),
@@ -39,14 +34,30 @@ const Home: React.FC<Props> = (props) => {
   return (
     <Layout>
       <div className="page">
-        <h1>Public Feed</h1>
-        <main>
+        <h1>Inboxes </h1>
+        {props.feed.map((d, i) => (
+          <div key={i} className="m-3 p-3 border-4">
+            <div className="">
+              <Link href={`/inbox/${d.id}`}>
+                <div className="font-bold hover:underline">{d.name} →</div>
+              </Link>
+              Maybe Add Children here
+              {/* <div className="">
+                {props.feed.map((d, i) => (
+                  <li key={i} className="relative flex gap-x-4"></li>
+                ))}
+              </div> */}
+            </div>
+          </div>
+        ))}
+
+        {/* <main>
           {props.feed.map((post) => (
             <div key={post.id} className="post">
               <Post post={post} />
             </div>
           ))}
-        </main>
+        </main> */}
       </div>
       <style jsx>{`
         .post {

@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import type { GetStaticProps } from "next";
+import type { GetStaticProps, GetStaticPaths } from "next";
 import { useSession } from "next-auth/react";
 import ReactMarkdown from "react-markdown";
 
@@ -8,6 +8,9 @@ import { PostProps } from "../../components/Post";
 
 import prisma from "../../lib/prisma";
 
+type Props = {
+  serializedFeedData: PostProps[];
+};
 export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   return {
     paths: [], //indicates that no page needs be created at build time
@@ -16,72 +19,76 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const feed = await prisma.post.findUnique({
+  const feed = await prisma.post.findMany({
+    // FIX: should replace with .findUnique
+
     where: {
       id: String(params?.id),
     },
+    include: {
+      Comment: {
+        select: {
+          text: true,
+        },
+      },
+    },
   });
 
-  const serializedFeedData = feed((item) => ({
+  const serializedFeedData = feed.map((item) => ({
     ...item,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
   }));
+  console.log(serializedFeedData);
   return {
     props: {
-      feed: serializedFeedData,
+      serializedFeedData,
     },
     revalidate: 10,
   };
 };
 
-const Post: React.FC<PostProps> = (props, { currentDate }) => {
+const Post: React.FC<Props> = (props, { currentDate }) => {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
     return <div>Authenticating ...</div>;
   }
-  const userHasValidSession = Boolean(session);
-  const postBelongsToUser = session?.user?.email === props.author?.email;
-  let title = props.title;
-  if (!props.published) {
-    title = `${title} (Draft)`;
-  }
+  // const userHasValidSession = Boolean(session);
+  // const postBelongsToUser = session?.user?.email === props.author?.email;
 
   return (
     <Layout>
       <div>
         <div>
-          <ReactMarkdown children={props.content} />
-
-          <p>By {props?.author?.name || "Unknown author"}</p>
+          <ReactMarkdown children={props.serializedFeedData[0].content} />
+          <p>From [Load in authur]</p>
         </div>
-        List Commenents
-        <ul role="list" className="space-y-6">
-          {props.Comment.map((d, i) => (
-            <li key={i} className="relative flex gap-x-4">
-              <div className="absolute left-0 top-0 flex w-6 justify-center">
-                <div className="w-px bg-gray-200" />
-              </div>
-              <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white"></div>
-              <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500">
-                <span className="font-medium text-gray-900">
-                  <ReactMarkdown children={d.text} />
-                </span>
-              </p>
-              <time
-                dateTime=""
-                className="flex-none py-0.5 text-xs leading-5 text-gray-500"
-              >
-                Date{" "}
-              </time>
-            </li>
-
-            // <div key={i} className="">
-            //   <ReactMarkdown children={d.text} />
-            // </div>
-          ))}
-        </ul>
+        {/* New comment form */}
+        <div>
+          Comments:
+          <ul role="list" className="space-y-6">
+            {props.serializedFeedData[0].Comment.map((d, i) => (
+              <li key={i} className="relative flex gap-x-4">
+                <div className="absolute left-0 top-0 flex w-6 justify-center">
+                  <div className="w-px bg-gray-200" />
+                </div>
+                <div className="relative flex h-6 w-6 flex-none items-center justify-center bg-white"></div>
+                <p className="flex-auto py-0.5 text-xs leading-5 text-gray-500">
+                  <span className="font-medium text-gray-900">
+                    <ReactMarkdown children={String(d.text)} />
+                  </span>
+                </p>
+                <time
+                  dateTime=""
+                  className="flex-none py-0.5 text-xs leading-5 text-gray-500"
+                >
+                  Date{" "}
+                </time>
+              </li>
+            ))}
+          </ul>
+        </div>
         {/* New comment form */}
         <div className="mt-6 flex gap-x-3">
           <div className="h-6 w-6 flex-none rounded-full bg-gray-50"></div>

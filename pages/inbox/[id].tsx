@@ -1,12 +1,16 @@
 import React, { Fragment, useState } from "react";
-import type { GetStaticProps } from "next";
+import type { GetStaticProps, GetStaticPaths } from "next";
 import ReactMarkdown from "react-markdown";
 
 import Layout from "../../components/Layout";
 import Router from "next/router";
-import { PostProps } from "../../components/Post";
+import { InboxProps } from "../../components/Inbox";
 import prisma from "../../lib/prisma";
 import { useSession } from "next-auth/react";
+
+type Props = {
+  serializedFeedData: InboxProps[];
+};
 
 export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   return {
@@ -16,7 +20,8 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const post = await prisma.inbox.findUnique({
+  const feed = await prisma.inbox.findMany({
+    // FIX: should replace with .findUnique
     where: {
       id: String(params?.id),
     },
@@ -33,29 +38,39 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       },
     },
   });
+
+  const serializedFeedData = feed.map((item) => ({
+    ...item,
+    createdAt: item.createdAt.toISOString(),
+    updatedAt: item.updatedAt.toISOString(),
+  }));
+  console.log(serializedFeedData);
+
   return {
-    props: post,
+    props: { serializedFeedData },
     revalidate: 10,
   };
 };
 
-const Inbox: React.FC<PostProps> = (props) => {
+const Inbox: React.FC<Props> = (props) => {
   const { data: session, status } = useSession();
-  console.log(props);
   if (status === "loading") {
     return <div>Authenticating ...</div>;
   }
-  const userHasValidSession = Boolean(session);
-  const postBelongsToUser = session?.user?.email === props.author?.email;
-
+  // const userHasValidSession = Boolean(session);
+  // const postBelongsToUser = session?.user?.email === props.author?.email;
   return (
     <Layout>
       <div className="py-9">
-        <div className="font-bold ">Inbox {props.name}</div>
-        <div className="">{props?.description || "No Description"}</div>
+        <div className="font-bold ">
+          Inbox {props?.serializedFeedData[0].name || "No Name"}
+        </div>
+        <div className="">
+          {props?.serializedFeedData[0].description || "No Description"}
+        </div>
       </div>
       <ul role="list" className="space-y-6">
-        {props.Post.map((d, i) => (
+        {props.serializedFeedData[0].Post.map((d, i) => (
           <li key={i} className="relative flex gap-x-4">
             <div className="absolute left-0 top-0 flex w-6 justify-center">
               <div className="w-px bg-gray-200" />

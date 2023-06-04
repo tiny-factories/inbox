@@ -6,16 +6,14 @@ import prisma from "../lib/prisma";
 
 import { InboxProps } from "../components/Inbox";
 import Layout from "../components/Layout";
-import Dropdown from "../components/SelectUserDropdown";
 
 type Inbox = {
-  feed: InboxProps[];
+  inbox: InboxProps[];
 };
 
-const CreatePost: React.FC = (props) => {
+const CreatePost: React.FC<Inbox> = (props) => {
   const [inbox, setInbox] = useState<any[]>([]);
   const [content, setContent] = useState("");
-  console.log(props);
 
   const submitData = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -47,7 +45,7 @@ const CreatePost: React.FC = (props) => {
               -- Inbox --
             </option>
             {props.inbox.map((d, i) => (
-              <option key={i} value={d.id}>
+              <option key={i} value={String(d.id)}>
                 {d.name}
               </option>
             ))}
@@ -109,9 +107,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const inbox = await prisma.inbox.findMany({
     where: {},
   });
+  const serializedFeedData = inbox.map((item) => ({
+    ...item,
+    createdAt: item.createdAt.toISOString(),
+    updatedAt: item.updatedAt.toISOString(),
+  }));
+
   return {
     props: {
-      inbox, // Wrap the inbox array inside the props object
+      inbox: serializedFeedData,
     },
     revalidate: 10,
   };
