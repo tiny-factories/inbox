@@ -2,7 +2,7 @@ import React from "react";
 import type { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
-import prisma from '../lib/prisma'
+import prisma from "../lib/prisma";
 
 export const getStaticProps: GetStaticProps = async () => {
   const feed = await prisma.post.findMany({
@@ -27,7 +27,7 @@ type Props = {
   feed: PostProps[];
 };
 
-const Blog: React.FC<Props> = (props) => {
+const Home: React.FC<Props> = (props) => {
   return (
     <Layout>
       <div className="page">
@@ -58,4 +58,4 @@ const Blog: React.FC<Props> = (props) => {
   );
 };
 
-export default Blog;
+export default Home;

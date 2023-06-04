@@ -19,6 +19,9 @@ const Dropdown = () => {
 
   return (
 	<select>
+		<option key="00" value="clidlt84t0000nj92s7qzzx8w">
+		  gndclouds
+		</option>
 	  {options.map((option) => (
 		<option key={option.id} value={option.value}>
 		  {option.label}

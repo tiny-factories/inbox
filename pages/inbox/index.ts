@@ -13,12 +13,9 @@ export default async function handle(
 
   const session = await getSession({ req });
   if (session) {
-    const result = await prisma.post.create({
+    const result = await prisma.inbox.create({
       data: {
-        inbox: { connect: { id: inbox } },
-        content: content,
-        author: { connect: { email: session?.user?.email } },
-        published: true,
+        name: name,
       },
     });
     res.json(result);

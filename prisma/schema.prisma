@@ -12,20 +12,37 @@ datasource db {
 
 model Post {
     id        String    @id @default(cuid())
-    title     String
-    content   String?
+    title     String?
+    content   String
     published Boolean   @default(false)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime? @updatedAt
     author    User?     @relation(fields: [authorId], references: [id])
     authorId  String?
+    inbox     Inbox?    @relation(fields: [inboxId], references: [id])
+    inboxId   String?
     tags      Tag[]
     Comment   Comment[]
+}
+
+model Inbox {
+    id          String    @id @default(cuid())
+    name        String
+    description String?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime? @updatedAt
+    public      Boolean   @default(false)
+    owners      User[]
+
+    Post Post[]
 }
 
 model Comment {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     text      String
-    author    String
+    author    User?    @relation(fields: [authorId], references: [id])
+    authorId  String?
     postId    String
     post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
@@ -80,6 +97,9 @@ model User {
     sessions      Session[]
     followedBy    Follows[] @relation("following")
     following     Follows[] @relation("follower")
+    Inbox         Inbox?    @relation(fields: [inboxId], references: [id])
+    inboxId       String?
+    Comment       Comment[]
 }
 
 model VerificationToken {
@@ -98,5 +118,4 @@ model Follows {
 
     @@id([followerId, followingId])
 }
-
 
