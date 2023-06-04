@@ -4,6 +4,10 @@ import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
 
+type Props = {
+  feed: PostProps[];
+};
+
 export const getStaticProps: GetStaticProps = async () => {
   const feed = await prisma.post.findMany({
     where: {
@@ -17,14 +21,18 @@ export const getStaticProps: GetStaticProps = async () => {
       },
     },
   });
+
+  const serializedFeedData = feed.map((item) => ({
+    ...item,
+    createdAt: item.createdAt.toISOString(),
+    updatedAt: item.updatedAt.toISOString(),
+  }));
   return {
-    props: { feed },
+    props: {
+      feed: serializedFeedData, // Use the serialized feed data in props
+    },
     revalidate: 10,
   };
-};
-
-type Props = {
-  feed: PostProps[];
 };
 
 const Home: React.FC<Props> = (props) => {

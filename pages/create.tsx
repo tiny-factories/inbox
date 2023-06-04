@@ -13,7 +13,7 @@ type Inbox = {
 };
 
 const CreatePost: React.FC = (props) => {
-  const [inbox, setInbox] = useState([]);
+  const [inbox, setInbox] = useState<any[]>([]);
   const [content, setContent] = useState("");
   console.log(props);
 
@@ -40,7 +40,7 @@ const CreatePost: React.FC = (props) => {
           <select
             name="inbox"
             id="inbox"
-            onChange={(e) => setInbox(e.target.value)}
+            onChange={(e) => setInbox([e.target.value])}
           >
             {" "}
             <option key="00" value="">

@@ -48,7 +48,7 @@ model Comment {
 }
 
 model Tag {
-    id    Int    @id @default(autoincrement())
+    id    String @id @default(cuid())
     name  String @unique
     posts Post[]
 }
@@ -118,4 +118,5 @@ model Follows {
 
     @@id([followerId, followingId])
 }
+
 

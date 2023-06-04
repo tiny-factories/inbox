@@ -16,27 +16,20 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const serializedCreatedAt = createdAt.toISOString();
-  const serializedUpdatedAt = updatedAt.toISOString();
-
-  const post = await prisma.post.findUnique({
+  const feed = await prisma.post.findUnique({
     where: {
       id: String(params?.id),
     },
-    include: {
-      Comment: {
-        select: {
-          text: true,
-        },
-      },
-    },
   });
 
+  const serializedFeedData = feed((item) => ({
+    ...item,
+    createdAt: item.createdAt.toISOString(),
+    updatedAt: item.updatedAt.toISOString(),
+  }));
   return {
     props: {
-      content: String,
-      createdAt: serializedCreatedAt,
-      updatedAt: serializedUpdatedAt,
+      feed: serializedFeedData,
     },
     revalidate: 10,
   };
@@ -117,9 +110,6 @@ const Post: React.FC<PostProps> = (props, { currentDate }) => {
             </div>
           </form>
         </div>{" "}
-        {userHasValidSession && postBelongsToUser && (
-          <button onClick={() => deletePost(props.id)}>Delete</button>
-        )}
       </div>
     </Layout>
   );
