@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { GetStaticProps } from "next";
 import Router from "next/router";
+import Link from "next/link";
 
 import prisma from "../lib/prisma";
 
@@ -58,9 +59,9 @@ const CreatePost: React.FC<Inbox> = (props) => {
             value={content}
           />
           <input disabled={!content || !inbox} type="submit" value="Share" />
-          <a className="back" href="#" onClick={() => Router.push("/")}>
+          <Link className="back" href="#" onClick={() => Router.push("/")}>
             or Cancel
-          </a>
+          </Link>
         </form>
       </div>
       <style jsx>{`

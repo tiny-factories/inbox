@@ -8,14 +8,14 @@ const Header: React.FC = () => {
   const isActive: (pathname: string) => boolean = (pathname) =>
     router.pathname === pathname;
 
-  const {data: session, status} = useSession();
+  const { data: session, status } = useSession();
 
   let left = (
     <div className="left">
       <Link href="/">
-        <a className="bold" data-active={isActive("/")}>
+        <div className="bold" data-active={isActive("/")}>
           Feed
-        </a>
+        </div>
       </Link>
       <style jsx>{`
         .bold {
@@ -41,13 +41,13 @@ const Header: React.FC = () => {
 
   let right = null;
 
-  if (status === 'loading') {
+  if (status === "loading") {
     left = (
       <div className="left">
         <Link href="/">
-          <a className="bold" data-active={isActive("/")}>
+          <div className="bold" data-active={isActive("/")}>
             Feed
-          </a>
+          </div>
         </Link>
         <style jsx>{`
           .bold {
@@ -86,7 +86,7 @@ const Header: React.FC = () => {
     right = (
       <div className="right">
         <Link href="/api/auth/signin">
-          <a data-active={isActive("/signup")}>Log in</a>
+          <div data-active={isActive("/signup")}>Log in</div>
         </Link>
         <style jsx>{`
           a {
@@ -117,11 +117,11 @@ const Header: React.FC = () => {
     left = (
       <div className="left">
         <Link href="/">
-          <a className="bold" data-active={isActive("/")}>
+          <div className="bold" data-active={isActive("/")}>
             Feed
-          </a>
+          </div>
         </Link>
-    
+
         <style jsx>{`
           .bold {
             font-weight: bold;
@@ -150,7 +150,7 @@ const Header: React.FC = () => {
         </p>
         <Link href="/create">
           <button>
-            <a>New post</a>
+            <div>New post</div>
           </button>
         </Link>
         <button onClick={() => signOut()}>
